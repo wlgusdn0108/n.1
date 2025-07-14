@@ -1,16 +1,13 @@
 import streamlit as st
-
-import streamlit as st
 import pandas as pd
 import plotly.express as px
 
 # ─── 페이지 설정 ────────────────────────────────
 st.set_page_config(page_title="프리미어리그 우승 횟수", layout="wide")
 st.title("🏆 프리미어리그 팀별 우승 횟수 대시보드")
-st.markdown("1992‑93 시즌부터 **2022‑23 시즌**까지, 시즌 범위를 선택해 팀별 우승 횟수를 확인하세요.")
+st.markdown("1992‑93 시즌부터 **2022‑23 시즌**까지, 시즌 범위를 선택해 팀별 우승 횟수와 우승 연도를 확인하세요.")
 
 # ─── 우승 데이터 (정적) ────────────────────────
-# 시즌별 챔피언 (92-93 ~ 22-23)
 champions = [
     "Man United","Man United","Blackburn Rovers","Man United","Man United",
     "Arsenal","Man United","Man United","Man United","Arsenal",
@@ -35,17 +32,21 @@ start, end = st.slider(
 )
 filtered = df[(df.Season >= start) & (df.Season <= end)]
 
-# ─── 우승 횟수 집계 ─────────────────────────────
-count = filtered["Champion"].value_counts().reset_index()
-count.columns = ["Team", "Titles"]
+# ─── 우승 횟수 및 연도 집계 ─────────────────────
+summary = (
+    filtered.groupby("Champion")["Season"]
+    .agg(["count", lambda x: ", ".join(str(season) for season in sorted(x))])
+    .reset_index()
+)
+summary.columns = ["Team", "Titles", "Seasons"]
 
 # ─── 결과 출력 ─────────────────────────────────
-st.subheader(f"{start}‑{end} 시즌 우승 횟수")
-st.table(count)
+st.subheader(f"{start}‑{end} 시즌 팀별 우승 횟수 및 연도")
+st.dataframe(summary.sort_values("Titles", ascending=False).reset_index(drop=True), use_container_width=True)
 
 # 차트
 fig = px.bar(
-    count.sort_values("Titles", ascending=False),
+    summary.sort_values("Titles", ascending=False),
     x="Team", y="Titles",
     title="🏟️ 팀별 우승 횟수",
     text="Titles"
@@ -53,5 +54,4 @@ fig = px.bar(
 fig.update_traces(textposition="outside")
 st.plotly_chart(fig, use_container_width=True)
 
-st.caption("※ 데이터: 1992‑93 시즌 ~ 2022‑23 시즌 우승 기록 (예시용 정적 데이터)")
-
+st.caption("※ 데이터: 1992‑93 시즌 ~ 2022‑23 시즌 프리미어리그 우승 기록 (정적 예시 데이터)")
