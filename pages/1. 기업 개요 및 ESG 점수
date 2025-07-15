@@ -4,70 +4,36 @@ import pandas as pd
 st.set_page_config(page_title="1. 기업 개요 및 ESG 점수", layout="centered")
 
 CSV_FILE = "esg_data.csv"
-
-# 데이터 불러오기
-try:
-    df = pd.read_csv(CSV_FILE)
-except FileNotFoundError:
-    st.error(f"⚠️ 데이터 파일 '{CSV_FILE}' 이(가) 존재하지 않습니다.\n같은 폴더에 CSV 파일을 올려주세요.")
-    st.stop()
+df = pd.read_csv(CSV_FILE)
 
 def get_grade(score):
-    if score >= 80:
-        return "A (우수)"
-    elif score >= 60:
-        return "B (보통)"
-    elif score >= 40:
-        return "C (주의)"
-    else:
-        return "D (위험)"
+    if score >= 80: return "A (우수)"
+    elif score >= 60: return "B (보통)"
+    elif score >= 40: return "C (주의)"
+    else: return "D (위험)"
 
-# 등급 컬럼 추가
+# 등급 계산
 df["Environmental_Grade"] = df["ESG_Environmental"].apply(get_grade)
 df["Social_Grade"] = df["ESG_Social"].apply(get_grade)
 df["Governance_Grade"] = df["ESG_Governance"].apply(get_grade)
 df["ESG_Grade"] = df["ESG_Overall"].apply(get_grade)
 
-# 제목
-st.markdown("""
-<style>
-.big-title {
-    font-size: 50px;
-    font-weight: bold;
-    color: #1F618D;
-    text-align: center;
-    margin-bottom: 30px;
-}
-.subtitle {
-    font-size: 22px;
-    color: #2E4053;
-    text-align: center;
-    margin-bottom: 40px;
-}
-.data-table {
-    font-size: 20px;
-}
-</style>
-""", unsafe_allow_html=True)
+# 최근 연도
+latest = df.iloc[-1]
 
-st.markdown('<div class="big-title">📊 1. 기업 개요 및 ESG 점수</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">선택한 기간 내 기업의 ESG 점수 및 등급을 확인합니다.</div>', unsafe_allow_html=True)
+st.title("📘 1. 기업 개요 및 ESG 점수")
+st.markdown("#### 기업의 ESG 핵심 정보를 요약합니다.")
 
-# 기업 정보
 st.markdown(f"""
-**기업명**: `{df['CompanyName'].iloc[0]}`  
-**산업군**: `{df['Industry'].iloc[0]}`  
-**지역**: `{df['Region'].iloc[0]}`
+- **기업명**: `{df['CompanyName'].iloc[0]}`
+- **산업군**: `{df['Industry'].iloc[0]}`
+- **지역**: `{df['Region'].iloc[0]}`
 """)
 
-# ESG 점수 및 등급 테이블 (전체 데이터 출력)
+st.markdown("#### 📊 연도별 ESG 점수 및 등급")
 st.dataframe(df[[
     "Year", "ESG_Environmental", "Environmental_Grade",
     "ESG_Social", "Social_Grade",
     "ESG_Governance", "Governance_Grade",
     "ESG_Overall", "ESG_Grade"
-]].style.set_properties(**{'font-size': '18px'}))
-
-# 발표자용 메시지 (원하면 추가)
-st.markdown("---")
-st.markdown("> 💡 주요 연도별 ESG 점수와 등급을 통해 기업의 지속가능성 현황을 파악할 수 있습니다.")
+]])
