@@ -13,7 +13,7 @@ except FileNotFoundError:
     st.error(f"⚠️ 데이터 파일 '{CSV_FILE}' 이(가) 존재하지 않습니다.\n같은 폴더에 CSV 파일을 올려주세요.")
     st.stop()
 
-# ESG 등급 함수 정의
+# ESG 등급 함수 정의 (필요시 유지해도 무방)
 def get_grade(score):
     if score >= 80:
         return "A (우수)"
@@ -23,12 +23,6 @@ def get_grade(score):
         return "C (주의)"
     else:
         return "D (위험)"
-
-# 등급 계산
-df["Environmental_Grade"] = df["ESG_Environmental"].apply(get_grade)
-df["Social_Grade"] = df["ESG_Social"].apply(get_grade)
-df["Governance_Grade"] = df["ESG_Governance"].apply(get_grade)
-df["ESG_Grade"] = df["ESG_Overall"].apply(get_grade)
 
 # 최근 데이터 기준
 latest = df.iloc[-1]
@@ -44,19 +38,6 @@ st.sidebar.markdown(f"""
 - **산업군**: `{df['Industry'].iloc[0]}`
 - **지역**: `{df['Region'].iloc[0]}`
 """)
-
-# 점수 테이블
-st.subheader("📈 ESG 점수 및 등급")
-st.dataframe(df[[
-    "Year", "ESG_Environmental", "Environmental_Grade",
-    "ESG_Social", "Social_Grade",
-    "ESG_Governance", "Governance_Grade",
-    "ESG_Overall", "ESG_Grade"
-]])
-
-# 라인차트
-st.subheader("📉 ESG 점수 변화 추이")
-st.line_chart(df.set_index("Year")[["ESG_Environmental", "ESG_Social", "ESG_Governance", "ESG_Overall"]])
 
 # 환경 지표 시각화
 st.subheader("🌿 환경 성과 지표 (탄소, 물, 에너지)")
