@@ -1,0 +1,86 @@
+import streamlit as st
+import pandas as pd
+
+st.set_page_config(page_title="3. 개선 과제 및 요약", layout="centered")
+
+CSV_FILE = "esg_data.csv"
+
+# 데이터 불러오기
+try:
+    df = pd.read_csv(CSV_FILE)
+except FileNotFoundError:
+    st.error(f"⚠️ 데이터 파일 '{CSV_FILE}' 이(가) 존재하지 않습니다.\n같은 폴더에 CSV 파일을 올려주세요.")
+    st.stop()
+
+def get_grade(score):
+    if score >= 80:
+        return "A (우수)"
+    elif score >= 60:
+        return "B (보통)"
+    elif score >= 40:
+        return "C (주의)"
+    else:
+        return "D (위험)"
+
+# 최신 데이터
+latest = df.iloc[-1]
+
+# 스타일링
+st.markdown("""
+<style>
+.big-title {
+    font-size: 50px;
+    font-weight: bold;
+    color: #B03A2E;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.subtitle {
+    font-size: 22px;
+    color: #873600;
+    text-align: center;
+    margin-bottom: 40px;
+}
+.improvement {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+.grade {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="big-title">🛠️ 3. 개선 과제 및 요약</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">최근 ESG 데이터 기반으로 주요 개선 과제와 등급을 요약합니다.</div>', unsafe_allow_html=True)
+
+# 개선 과제 도출
+improvements = []
+if latest["ESG_Environmental"] < 60:
+    improvements.append("✔ **환경(E)**: 탄소 감축, 친환경 설비 도입 필요")
+if latest["ESG_Social"] < 60:
+    improvements.append("✔ **사회(S)**: 직원 만족도 제고, 지역사회 활동 강화 필요")
+if latest["ESG_Governance"] < 60:
+    improvements.append("✔ **지배구조(G)**: 투명경영, 이사회 다양성 확대 필요")
+
+# 개선 과제 출력
+st.subheader("🔍 개선 과제")
+if improvements:
+    for imp in improvements:
+        st.markdown(f'<div class="improvement">{imp}</div>', unsafe_allow_html=True)
+else:
+    st.success("모든 ESG 항목이 양호한 수준입니다. 🎉")
+
+# 등급 요약
+st.subheader("📊 최신 ESG 등급 요약")
+st.markdown(f"""
+- **환경 (E)**: <span class="grade">{get_grade(latest['ESG_Environmental'])}</span>  
+- **사회 (S)**: <span class="grade">{get_grade(latest['ESG_Social'])}</span>  
+- **지배구조 (G)**: <span class="grade">{get_grade(latest['ESG_Governance'])}</span>  
+- **종합 ESG**: <span class="grade">{get_grade(latest['ESG_Overall'])}</span>  
+""", unsafe_allow_html=True)
+
+st.markdown("---")
+st.markdown("> 💡 ESG 등급과 개선 과제를 바탕으로 지속가능성 전략을 구체화할 수 있습니다.")
