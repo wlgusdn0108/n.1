@@ -1,0 +1,74 @@
+import streamlit as st
+import pandas as pd
+
+st.set_page_config(page_title="2. ESG 점수 추이 및 환경지표", layout="centered")
+
+CSV_FILE = "esg_data.csv"
+
+# 데이터 불러오기
+try:
+    df = pd.read_csv(CSV_FILE)
+except FileNotFoundError:
+    st.error(f"⚠️ 데이터 파일 '{CSV_FILE}' 이(가) 존재하지 않습니다.\n같은 폴더에 CSV 파일을 올려주세요.")
+    st.stop()
+
+# 스타일링
+st.markdown("""
+<style>
+.big-title {
+    font-size: 50px;
+    font-weight: bold;
+    color: #117A65;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.subtitle {
+    font-size: 22px;
+    color: #145A32;
+    text-align: center;
+    margin-bottom: 40px;
+}
+.metric-value {
+    font-size: 24px;
+    font-weight: bold;
+}
+.metric-label {
+    font-size: 18px;
+    color: #555;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="big-title">📉 2. ESG 점수 추이 및 환경지표</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">ESG 점수 변화 추이 및 환경 성과 지표를 시각화합니다.</div>', unsafe_allow_html=True)
+
+# ESG 점수 추이 라인 차트
+st.subheader("📊 ESG 점수 변화 추이")
+score_chart_data = df.set_index("Year")[["ESG_Environmental", "ESG_Social", "ESG_Governance", "ESG_Overall"]]
+st.line_chart(score_chart_data)
+
+# 환경 성과 지표
+st.subheader("🌿 환경 성과 지표")
+
+cols = st.columns(3)
+
+with cols[0]:
+    latest_val = df.iloc[-1]["CarbonEmissions"]
+    st.markdown(f'<div class="metric-label">🌍 탄소배출량 (tCO₂)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-value">{latest_val}</div>', unsafe_allow_html=True)
+    st.line_chart(df.set_index("Year")[["CarbonEmissions"]])
+
+with cols[1]:
+    latest_val = df.iloc[-1]["WaterUsage"]
+    st.markdown(f'<div class="metric-label">💧 물 사용량 (tons)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-value">{latest_val}</div>', unsafe_allow_html=True)
+    st.line_chart(df.set_index("Year")[["WaterUsage"]])
+
+with cols[2]:
+    latest_val = df.iloc[-1]["EnergyConsumption"]
+    st.markdown(f'<div class="metric-label">⚡ 에너지 소비량 (MWh)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-value">{latest_val}</div>', unsafe_allow_html=True)
+    st.line_chart(df.set_index("Year")[["EnergyConsumption"]])
+
+st.markdown("---")
+st.markdown("> 💡 ESG 점수의 추이와 환경 지표 변화를 함께 파악하여 기업의 지속가능성 개선 방향을 모색합니다.")
