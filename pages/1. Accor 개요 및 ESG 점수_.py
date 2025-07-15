@@ -21,11 +21,8 @@ df["ESG_Grade"] = df["ESG_Overall"].apply(get_grade)
 # 최근 연도
 latest = df.iloc[-1]
 
-# 기업명 수정
-df.loc[df["CompanyName"] == "Company 1", "CompanyName"] = "Accor"
-
-st.title("\ud83d\udcd8 1. \uae30\uc5c5 \uac1c\uc694 \ubc0f ESG \uc810\uc218")
-st.markdown("#### \uae30\uc5c5\uc758 ESG \ud574\uc0c1 \uc815\ubcf4\ub97c \uc694\uc57d\ud569\ub2c8\ub2e4.")
+st.title("📘 1. 기업 개요 및 ESG 점수")
+st.markdown("#### 기업의 ESG 핵심 정보를 요약합니다.")
 
 st.markdown(f"""
 - **기업명**: `{df['CompanyName'].iloc[0]}`
@@ -33,11 +30,10 @@ st.markdown(f"""
 - **지역**: `{df['Region'].iloc[0]}`
 """)
 
-st.markdown("#### \ud83d\udcca \uc5f0\ub3cc\ubcc4 ESG \uc810\uc218 \ubc0f \ub4f1\uae09")
+st.markdown("#### 📊 연도별 ESG 점수 및 등급")
 st.dataframe(df[[
     "Year", "ESG_Environmental", "Environmental_Grade",
     "ESG_Social", "Social_Grade",
     "ESG_Governance", "Governance_Grade",
     "ESG_Overall", "ESG_Grade"
 ]])
-
